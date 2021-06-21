@@ -1,0 +1,28 @@
+
+<mat-card class="hh">
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="Login()">
+              
+        <h2>Admin</h2>
+        <div>
+        <mat-error class="incorrect" *ngIf="loginInvalid"> Username et/ou mot de passe incorrect.</mat-error>
+
+        <mat-form-field >
+          <mat-label color="green">Username</mat-label>
+          <input matInput color="green" placeholder="Username" formControlName="username"  required/>
+          <mat-icon matSuffix>supervised_user_circle</mat-icon>
+          <mat-error>Veuillez entrer votre username.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field >
+          <mat-label>Password</mat-label>
+          <input matInput type="password" placeholder="Password" formControlName="password" required/>
+          <mat-icon matSuffix >{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>         
+          <mat-error>Veuillez enter votre mot de passe.</mat-error>
+        </mat-form-field>
+        
+      </div>
+      <button class="login">Login</button>
+    </form>
+  </mat-card-content>
+</mat-card>

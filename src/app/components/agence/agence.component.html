@@ -1,0 +1,22 @@
+<div class=" content">
+    <div class=" row">
+      <div class=" col-md-12">
+        <div class=" card">
+          <div class=" card-header">Agencies List <i class="fas fa-university"></i></div>
+          <div class=" card-body">
+            <ng2-smart-table
+ [settings]="settings"
+  [source]="this.agences"
+  (createConfirm)="onAddAgence($event)"
+  (editConfirm)="onUpdateAgence($event)"
+  (deleteConfirm)="onDeleteAgence($event)"
+  (custom)="onCustomAction($event)"
+  (userRowSelect)="onUserRowSelect($event)"
+></ng2-smart-table>
+<mat-progress-spinner [mode]="'indeterminate'" *ngIf="loading$ | async"></mat-progress-spinner>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

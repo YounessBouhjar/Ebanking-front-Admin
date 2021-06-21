@@ -1,0 +1,20 @@
+<div class=" content">
+    <div class=" row">
+      <div class=" col-md-12">
+        <div class=" card">
+          <div class=" card-header">Agents List <i class="fas fa-users"></i></div>
+          <div class=" card-body">
+        
+            <ng2-smart-table
+            [settings]="settings"
+             [source]="this.agents"
+             (createConfirm)="onAddAgent($event)"
+             (editConfirm)="onUpdateAgent($event)"
+             (deleteConfirm)="onDeleteAgent($event)"
+           ></ng2-smart-table>
+           <mat-progress-spinner [mode]="'indeterminate'" *ngIf="loading$ | async"></mat-progress-spinner>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
