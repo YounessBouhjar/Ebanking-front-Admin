@@ -42,6 +42,7 @@ export class LoginComponent implements OnInit {
         (data) => {
           this.loginInvalid = false;
           this.router.navigate(['/agence'])
+          sessionStorage.setItem('password',btoa(this.password.value))
           console.log("data login : " +JSON.stringify(data));
         },
         (error) => {
