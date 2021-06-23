@@ -4,6 +4,7 @@ import { Agence } from 'src/app/models/agence';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LoadingService } from 'src/app/services/loading.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-agence',
@@ -69,7 +70,12 @@ export class AgenceComponent implements OnInit {
   agences : Agence[]=[];
   loading$ = this.loader.loading$;
   constructor(private agenceService:AgencesService,private router:Router,public loader:LoadingService) { }
-
+  alert:boolean = false
+  alertEmail:boolean = false
+  alertPhone:boolean =false
+  alertFax:boolean = false
+  alertPhoneEmail:boolean = false
+  
   ngOnInit(): void {
     this.getAgences();
  
@@ -82,30 +88,47 @@ export class AgenceComponent implements OnInit {
         console.log(response);
       },
       (error:HttpErrorResponse) => {
-        alert(error.message);
+      if(error.error.status==404){
+        this.agences=[];
+      }
         console.log(error.message)
       }
     );
   }
   onAddAgence(event){
-    if(window.confirm("êtes-vous sur de vouloir creér cette agence ?")){
+    Swal.fire({
+      title: 'Do you want to add this agency ?',
+     
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+    
+     
+    }).then((valeur)=>{
+      if(valeur.isConfirmed){
       if(event.newData.adresse===""||event.newData.fax===""||event.newData.email===""||event.newData.nom===""||event.newData.telephone===""){
-        alert('un champ est invalide, verifiez vos données !!')
+        this.alert=true;
       }
       else if(this.validateEmail(event.newData.email)===false){
-        alert('Champ email invalide !!! , verifiez vos données !!')
+       
+        this.alertEmail=true;
       }
       else if(this.validateNumber(event.newData.telephone)===false){
-        alert('Champ téléphone invalide !!! , verifiez vos données !!')
+       
+        this.alertPhone=true;
       }
       else if(this.validateNumber(event.newData.fax)===false){
-        alert('Champ téléphone invalide !!! , verifiez vos données !!')
+        this.alertFax=true;
+
       }
       else if(this.validateNumber(event.newData.telephone)===false && this.validateNumber(event.newData.telephone)===false){
-        alert('Champ téléphone et email invalide !!! , verifiez vos données !!')
+        this.alertPhoneEmail= true;
       }
       else{
-    
+        this.alertPhone=false;
+        this.alertFax=false;
+        this.alertEmail=false;
+        this.alertPhoneEmail = false
+        this.alert=false;
       
         this.agenceService.addAgence(event.newData).subscribe(
           response => {
@@ -123,26 +146,39 @@ export class AgenceComponent implements OnInit {
         );
       }
     }
+    });
   }
 
   onUpdateAgence(event){
-    if(event.newData.adresse===""||event.newData.fax===""||event.newData.email===""||event.newData.nom===""||event.newData.telephone===""){
-      alert('un champ est invalide, verifiez vos données !!')
+    Swal.fire({
+      title: 'Do you want to Edit this agency ?',
+     
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+    
+     
+    }).then((valeur)=>{
+      if(valeur.isConfirmed){
+      
     }
     else if(this.validateEmail(event.newData.email)===false){
-      alert('Champ email invalide !!! , verifiez vos données !!')
+      this.alertEmail=true;
     }
     else if(this.validateNumber(event.newData.telephone)===false){
-      alert('Champ téléphone invalide !!! , verifiez vos données !!')
+      this.alertPhone=true;
     }
     else if(this.validateNumber(event.newData.fax)===false){
-      alert('Champ téléphone invalide !!! , verifiez vos données !!')
+      this.alertFax=true;
     }
     else if(this.validateNumber(event.newData.telephone)===false && this.validateNumber(event.newData.telephone)===false){
-      alert('Champ téléphone et email invalide !!! , verifiez vos données !!')
+      this.alertPhoneEmail=true;
     }
-    else if(window.confirm("êtes-vous sur de vouloir modifier cette agence ?")){
-      
+    else{
+        this.alertPhone=false;
+        this.alertFax=false;
+        this.alertEmail=false;
+        this.alertPhoneEmail = false
+        this.alert=false;
       console.log(event.newData)
       this.agenceService.updateAgence(event.newData).subscribe(
         response => {
@@ -155,32 +191,53 @@ export class AgenceComponent implements OnInit {
           }
       );
     }
+  })
     }
   onDeleteAgence(event){
-    if(window.confirm("êtes-vous sur de vouloir supprimer cette agence ?")){
+    Swal.fire({
+      title: 'Do you want to delete agency: '+event.data.nom+' ?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
       console.log(event.data.id)
       this.agenceService.deleteAgence(event.data.id).subscribe(
         response =>{
           console.log ("Delete : " + response)
           this.getAgences();
+          Swal.fire(
+            'Deleted!',
+            'Your agency has been deleted.',
+            'success'
+          )
         },
         (error:HttpErrorResponse) => {
           console.log(error);
           
           }
       )
+      
     }
+  });
   }
 
   onCustomAction(event:any):void{
     console.log(event);
     console.log('row selected: '+event.data.id);
+    sessionStorage.setItem("agence",event.data.id);
+    sessionStorage.setItem("agenceNom",event.data.nom)
     this.router.navigate(['/agent'],{ state: event.data });
     
   }
   onUserRowSelect(event:any):void{
     console.log(event);
     console.log('row selected: '+event.data.id);
+    sessionStorage.setItem("agence",event.data.id);
+    sessionStorage.setItem("agenceNom",event.data.nom)
     this.router.navigate(['/agent'],{ state: event.data });
     
   }
