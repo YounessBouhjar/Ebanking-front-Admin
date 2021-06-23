@@ -159,8 +159,11 @@ export class AgenceComponent implements OnInit {
      
     }).then((valeur)=>{
       if(valeur.isConfirmed){
+        if(event.newData.adresse===""||event.newData.fax===""||event.newData.email===""||event.newData.nom===""||event.newData.telephone===""){
+          this.alert=true;
+        }
       
-    }
+    
     else if(this.validateEmail(event.newData.email)===false){
       this.alertEmail=true;
     }
@@ -191,7 +194,8 @@ export class AgenceComponent implements OnInit {
           }
       );
     }
-  })
+  }
+})
     }
   onDeleteAgence(event){
     Swal.fire({
