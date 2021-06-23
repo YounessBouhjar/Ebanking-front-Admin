@@ -2,7 +2,14 @@
     <div class=" row">
       <div class=" col-md-12">
         <div class=" card">
-          <div class=" card-header">{{agence.nom}} <i class="fas fa-university"></i></div>
+          <div class=" card-header">{{agenceNom}} <i class="fas fa-university"></i></div>
+
+          <div *ngIf="alert;else false" class="alert alert-danger" role="alert">Invalid, check your fields !!</div>
+          <div *ngIf="alertEmail;else false" class="alert alert-danger" role="alert">Email field invalide !!</div>
+          <div *ngIf="alertPhone;else false" class="alert alert-danger" role="alert">Phone field invalide !!</div>
+         
+          
+
           <div class=" card-body">
             <ng2-smart-table
             [settings]="settings"

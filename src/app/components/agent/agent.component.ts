@@ -6,6 +6,7 @@ import { AgentsService } from 'src/app/services/agents.service';
 import { Agent } from 'src/app/models/agent';
 import { Agence } from 'src/app/models/agence';
 import { LoadingService } from 'src/app/services/loading.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-agent',
@@ -70,6 +71,7 @@ export class AgentComponent implements OnInit {
   agents : Agent[]=[];
   agences : Agence[]=[];
   agence : any;
+  agenceNom:string=sessionStorage.getItem("agenceNom")
   loading$ = this.loader.loading$;
   constructor(private agentService:AgentsService, private router :Router,public loader:LoadingService) { 
     this.agence=this.router.getCurrentNavigation().extras.state;
@@ -80,31 +82,46 @@ export class AgentComponent implements OnInit {
   }
 
   getAgents(){
-    this.agentService.getAgent(this.agence.id).subscribe(
+    this.agentService.getAgent(parseInt(sessionStorage.getItem("agence"))).subscribe(
       (response : Agent[])=>{
         this.agents=response;
         console.log(response);
       },
       (error:HttpErrorResponse) => {
-        alert(error.message);
+        if(error.error.status==404){
+          this.agents=[];
+        }
         console.log(error.message);
       }
     );
 
 }
+alert:boolean=false;
+alertEmail:boolean=false;
+alertPhone:boolean=false;
   onAddAgent(event){
-   // console.log(this.settings.columns.agence.editor.config.list) 
-    if(window.confirm('êtes-vous sur de vouloir creér cet agent ?')){
+    Swal.fire({
+      title: 'Do you want to add this agent ?',
+     
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+    
+     
+    }).then((valeur)=>{
+      if(valeur.isConfirmed){
       if(event.newData.adresse===""||event.newData.cin===""||event.newData.email===""||event.newData.nom===""||event.newData.telephone===""||event.newData.prenom===""||event.newData.username===""||event.newData.password===""){
-        alert('un champ est invalide, verifiez vos données !!')
+        this.alert=true
       }
       else if(this.validateEmail(event.newData.email)===false){
-        alert('Champ email invalide !!! , verifiez vos données !!')
+       this.alertEmail=true
       }
       else if(this.validateNumber(event.newData.telephone)===false){
-        alert('Champ téléphone invalide !!! , verifiez vos données !!')
+        this.alertPhone=true;
       }
       else{
+        this.alert=false;
+        this.alertEmail=false;
+        this.alertPhone=false;
       console.log(event.newData)
       event.newData.agence=this.agence
       console.log(event.newData.agence)
@@ -119,19 +136,34 @@ export class AgentComponent implements OnInit {
       )
     }
     }
+  })
   }
 
   onUpdateAgent(event){
+    Swal.fire({
+      title: 'Do you want to edit this agent ?',
+     
+      showCancelButton: true,
+      confirmButtonText: 'Yes',
+    
+     
+    }).then((valeur)=>{
+      if(valeur.isConfirmed){
     if(event.newData.adresse===""||event.newData.cin===""||event.newData.email===""||event.newData.nom===""||event.newData.telephone===""||event.newData.prenom===""||event.newData.username===""||event.newData.password===""){
-      alert('un champ est invalide, verifiez vos données !!')
+      this.alert=true
     }
     else if(this.validateEmail(event.newData.email)===false){
-      alert('Champ email invalide !!! , verifiez vos données !!')
+     
+      this.alertEmail=true
     }
     else if(this.validateNumber(event.newData.telephone)===false){
-      alert('Champ téléphone invalide !!! , verifiez vos données !!')
+    
+      this.alertPhone=true
     }
-    else if(window.confirm('êtes-vous sur de vouloir modifier cet agent ?')){
+    else{
+        this.alert=false;
+        this.alertEmail=false;
+        this.alertPhone=false;
       this.agentService.updateAgent(event.newData).subscribe(
         response => {
           console.log("Edit : "+ response);
@@ -144,21 +176,43 @@ export class AgentComponent implements OnInit {
       )
     }
   }
+})
+  }
 
   onDeleteAgent(event){
-    if(window.confirm('êtes-vous sur de vouloir supprimer cet agent ?')){
+     Swal.fire({
+      title: 'Do you want to delete agent: '+event.data.nom+' '+event.data.prenom+' ?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        
       this.agentService.deleteAgent(event.data.id).subscribe(
         response => {
+          Swal.fire(
+            'Deleted!',
+            'Your client has been deleted.',
+            'success'
+          )
           console.log("delete : "+ response);
           this.getAgents();
         },
         (error:HttpErrorResponse) => {
-          alert("Veuillez supprimer les clients liés à cet agent en premier")
+          Swal.fire(
+            'Deleted!',
+            'Please delete clients related to this agent.',
+            'error'
+          )
           console.log(error);
           
           }
       )
     }
+  })
   }
 
   getListAgences(){
