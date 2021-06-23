@@ -16,7 +16,7 @@ export class AuthentificationService {
       
     });
     return this.httpClient
-      .get<Admin>('http://localhost:8091/admin/username/'+username, {headers,})
+      .get<Admin>('https://ebanking-app.herokuapp.com/admin/username/'+username, {headers,})
       .pipe( 
         map((userData) => {
           sessionStorage.setItem('username', username);
